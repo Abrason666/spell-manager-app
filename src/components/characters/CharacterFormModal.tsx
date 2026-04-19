@@ -107,7 +107,11 @@ export function CharacterFormModal({ open, onClose, onSave, initial }: Character
             </div>
             <div className="space-y-2">
               <Label>Livello</Label>
-              <Input type="number" min={1} max={20} value={level} onChange={(e) => setLevel(Number(e.target.value))} />
+              <Input type="number" min={1} max={20}
+                value={level || ''}
+                onChange={(e) => { const n = parseInt(e.target.value, 10); setLevel(isNaN(n) ? 0 : n) }}
+                onBlur={() => { if (!level || level < 1) setLevel(1) }}
+              />
             </div>
           </div>
 
@@ -135,7 +139,11 @@ export function CharacterFormModal({ open, onClose, onSave, initial }: Character
               </div>
               <div className="space-y-2">
                 <Label>Livello (max {20 - level})</Label>
-                <Input type="number" min={1} max={20 - level} value={level2} onChange={(e) => setLevel2(Number(e.target.value))} />
+                <Input type="number" min={1} max={20 - level}
+                  value={level2 || ''}
+                  onChange={(e) => { const n = parseInt(e.target.value, 10); setLevel2(isNaN(n) ? 0 : n) }}
+                  onBlur={() => { if (!level2 || level2 < 1) setLevel2(1) }}
+                />
               </div>
             </div>
           ) : (

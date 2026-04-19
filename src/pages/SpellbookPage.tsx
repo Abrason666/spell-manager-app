@@ -286,14 +286,12 @@ export function SpellbookPage() {
       )}
       <SpellFilters onReset={handleResetFilters} />
       <p className="text-xs text-muted-foreground px-0.5">{filteredSpells.length} incantesimi trovati</p>
-      <div className="overflow-y-auto max-h-[calc(100vh-320px)] lg:max-h-[calc(100vh-220px)]">
-        <SpellList
-          spells={filteredSpells}
-          spellIdsInList={spellIdsInList}
-          loading={spellsLoading}
-          onAdd={handleAdd}
-        />
-      </div>
+      <SpellList
+        spells={filteredSpells}
+        spellIdsInList={spellIdsInList}
+        loading={spellsLoading}
+        onAdd={handleAdd}
+      />
     </div>
   )
 

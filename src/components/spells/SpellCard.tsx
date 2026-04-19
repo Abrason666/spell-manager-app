@@ -31,18 +31,16 @@ export function SpellCard({ spell, isInList, onAdd, onViewDetail }: SpellCardPro
         <p className="font-medium text-sm leading-tight truncate group-hover:text-primary transition-colors">
           {spell.name}
         </p>
-        <div className="mt-2 flex items-center gap-2">
-          <div className="w-[6.5rem] shrink-0">
-            <span className={cn('inline-flex items-center rounded px-1.5 py-0.5 text-[11px] font-medium', SCHOOL_COLORS[spell.school] ?? 'bg-muted text-muted-foreground')}>
-              {spell.school}
-            </span>
-          </div>
-          <span className="text-[11px] text-muted-foreground">{spell.casting_time}</span>
-          <div className="flex gap-1">
+        <div className="mt-1.5 flex items-center gap-2">
+          <span className={cn('inline-flex items-center rounded px-1.5 py-0.5 text-[11px] font-medium shrink-0', SCHOOL_COLORS[spell.school] ?? 'bg-muted text-muted-foreground')}>
+            {spell.school}
+          </span>
+          <div className="flex gap-1 shrink-0">
             {spell.concentration && <span className="text-[10px] font-bold text-yellow-400 bg-yellow-400/10 border border-yellow-400/20 rounded px-1">C</span>}
             {spell.ritual && <span className="text-[10px] font-bold text-purple-400 bg-purple-400/10 border border-purple-400/20 rounded px-1">R</span>}
           </div>
         </div>
+        <p className="mt-0.5 text-[11px] text-muted-foreground truncate">{spell.casting_time}</p>
       </div>
 
       {/* Aggiungi */}

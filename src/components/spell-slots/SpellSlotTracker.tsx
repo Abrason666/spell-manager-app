@@ -73,18 +73,20 @@ export function SpellSlotTracker({ slots, characterId, character, loading }: Spe
         </div>
       </div>
 
-      {/* Slot principali */}
+      {/* Slot principali — escludi posizioni pact-only */}
       <div className="px-3 divide-y divide-border/30">
-        {slots.map((slot) => (
-          <SpellSlotRow key={slot.id} slot={slot} characterId={characterId} />
-        ))}
+        {slots
+          .filter((_, i) => !pactSlots || mainSlots[i] > 0)
+          .map((slot) => (
+            <SpellSlotRow key={slot.id} slot={slot} characterId={characterId} />
+          ))}
       </div>
 
       {/* Pact Magic separata (warlock multiclasse) */}
-      {multiclass && pactSlots && character.class2 === 'warlock' || multiclass && pactSlots && character.class === 'warlock' ? (
+      {multiclass && pactSlots && (character.class === 'warlock' || character.class2 === 'warlock') ? (
         <div className="border-t border-border/40 px-3 pb-1">
           <p className="pt-2 pb-1 text-[10px] font-semibold uppercase tracking-widest text-violet-400">
-            Pact Magic — {CLASS_LABELS[character.class === 'warlock' ? character.class : character.class2!]}
+            Pact Magic — {CLASS_LABELS['warlock']}
           </p>
           <div className="divide-y divide-border/30">
             {slots

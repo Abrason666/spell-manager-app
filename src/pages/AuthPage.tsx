@@ -71,16 +71,6 @@ export function AuthPage() {
             : <RegisterForm onSwitch={() => setMode('login')} />
           }
 
-          {/* Switch */}
-          <p className="mt-5 text-center text-xs text-muted-foreground">
-            {mode === 'login' ? 'Nuovo qui?' : 'Hai già un account?'}{' '}
-            <button
-              className="font-medium text-primary hover:underline"
-              onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
-            >
-              {mode === 'login' ? 'Registrati' : 'Accedi'}
-            </button>
-          </p>
         </div>
       </div>
     </div>

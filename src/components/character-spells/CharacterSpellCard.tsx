@@ -25,18 +25,22 @@ export function CharacterSpellCard({ charSpell, characterId, onRemove }: Charact
   const touchStartX = useRef(0)
   const touchStartY = useRef(0)
   const didSwipe = useRef(false)
+  const touchActive = useRef(false)
 
   const isPrepared = charSpell.is_prepared
   const isCantrip = spell.level === 0
   const borderColor = SCHOOL_BORDER[spell.school] ?? 'border-l-border'
 
   function onTouchStart(e: React.TouchEvent) {
+    touchActive.current = true
     touchStartX.current = e.touches[0].clientX
     touchStartY.current = e.touches[0].clientY
     didSwipe.current = false
   }
 
   function onTouchEnd(e: React.TouchEvent) {
+    if (!touchActive.current) return
+    touchActive.current = false
     const dx = e.changedTouches[0].clientX - touchStartX.current
     const dy = e.changedTouches[0].clientY - touchStartY.current
     if (Math.abs(dx) < Math.abs(dy)) return

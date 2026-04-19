@@ -77,7 +77,6 @@ export function CharacterSpellCard({ charSpell, characterId, onRemove }: Charact
 
         {/* Card principale */}
         <div
-          {...handlers}
           className={cn(
             'relative border border-border/60 bg-card border-l-2',
             borderColor,
@@ -100,8 +99,9 @@ export function CharacterSpellCard({ charSpell, characterId, onRemove }: Charact
               {formatLevel(spell.level)}
             </div>
 
-            {/* Info */}
+            {/* Info — swipe handler solo qui, lontano dai bottoni */}
             <div
+              {...handlers}
               className="min-w-0 flex-1 cursor-pointer"
               onClick={() => { if (!swiped) setShowDetail(true) }}
             >

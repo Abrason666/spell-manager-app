@@ -79,7 +79,6 @@ export function CharacterCard({ character, isActive, onEdit, onDelete }: Charact
 
       {/* Card principale */}
       <div
-        {...handlers}
         className={cn(
           'relative bg-card border rounded-xl cursor-pointer active:brightness-95',
           isActive
@@ -97,7 +96,8 @@ export function CharacterCard({ character, isActive, onEdit, onDelete }: Charact
 
         <div className="p-5">
           <div className="flex items-start justify-between gap-2 mb-4">
-            <div className="flex items-center gap-3 min-w-0">
+            {/* Zona swipe: solo info personaggio, non il bottone matita */}
+            <div {...handlers} className="flex items-center gap-3 min-w-0 flex-1">
               <div className={cn('flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-2xl border', classColor)}>
                 {classIcon}
               </div>

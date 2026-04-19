@@ -208,29 +208,30 @@ export function isMulticlass(cls2: string | null | undefined): cls2 is string {
   return !!cls2
 }
 
-// ── Max spell preparabili per classe ──────────────────────────────────────────
-// Classi con preparazione: Cleric (SAG), Druid (SAG), Wizard (INT),
-// Paladin (CAR, mezzo livello), Ranger (SAG, mezzo livello).
-// Bard/Sorcerer/Warlock = incantesimi noti, nessuna preparazione.
+// ── Max spell preparabili per classe (5e 2024 PHB) ───────────────────────────
+// Valori per livello 1-20, letti direttamente dalle tabelle di classe.
 
-const PREP_MOD: Record<string, { mod: string; half: boolean } | null> = {
-  cleric:   { mod: 'SAG', half: false },
-  druid:    { mod: 'SAG', half: false },
-  wizard:   { mod: 'INT', half: false },
-  paladin:  { mod: 'CAR', half: true },
-  ranger:   { mod: 'SAG', half: true },
-  bard:     null,
-  sorcerer: null,
-  warlock:  null,
+const lv = (arr: number[]): Record<number, number> =>
+  Object.fromEntries(arr.map((v, i) => [i + 1, v]))
+
+const FULL_CASTER_PREP = lv([4,5,6,7,9,10,11,12,14,15,16,16,17,17,18,18,19,20,21,22])
+const SORCERER_PREP    = lv([2,4,6,7,9,10,11,12,14,15,16,16,17,17,18,18,19,20,21,22])
+const WIZARD_PREP      = lv([4,5,6,7,9,10,11,12,14,15,16,16,17,18,19,21,22,23,24,25])
+const HALF_CASTER_PREP = lv([2,3,4,5,6,6,7,7,9,9,10,10,11,11,12,12,14,14,15,15])
+const WARLOCK_PREP     = lv([2,3,4,5,6,7,8,9,10,10,11,11,12,12,13,13,14,14,15,15])
+
+const PREPARED_TABLE: Record<string, Record<number, number>> = {
+  bard:     FULL_CASTER_PREP,
+  cleric:   FULL_CASTER_PREP,
+  druid:    FULL_CASTER_PREP,
+  sorcerer: SORCERER_PREP,
+  wizard:   WIZARD_PREP,
+  paladin:  HALF_CASTER_PREP,
+  ranger:   HALF_CASTER_PREP,
+  warlock:  WARLOCK_PREP,
 }
 
-/**
- * Restituisce la formula testuale del massimo di spell preparabili,
- * es. "SAG + 5" per un Druid 5. Null per classi senza preparazione.
- */
-export function getMaxPreparedFormula(cls: string, level: number): string | null {
-  const entry = PREP_MOD[cls]
-  if (!entry) return null
-  const lv = entry.half ? Math.floor(level / 2) : level
-  return `${entry.mod} + ${lv}`
+/** Numero massimo di spell preparabili per classe e livello (2024 PHB). */
+export function getMaxPrepared(cls: string, level: number): number | null {
+  return PREPARED_TABLE[cls]?.[level] ?? null
 }

@@ -16,7 +16,7 @@ import { useCharacters, useUpdateCharacter } from '@/hooks/useCharacters'
 import { useUIStore } from '@/stores/uiStore'
 import { useFilterStore } from '@/stores/filterStore'
 import { useAuth } from '@/hooks/useAuth'
-import { isMulticlass, CLASS_ICONS, cn, getMaxPreparedFormula } from '@/lib/utils'
+import { isMulticlass, CLASS_ICONS, cn, getMaxPrepared } from '@/lib/utils'
 import { ClassChipSwitcher } from '@/components/ui/ClassChipSwitcher'
 import type { ClassFilter } from '@/components/ui/ClassChipSwitcher'
 import type { Spell } from '@/types'
@@ -122,14 +122,13 @@ export function SpellbookPage() {
     [charSpells]
   )
 
-  const prepFormula = useMemo(() => {
+  const maxPrepared = useMemo(() => {
     if (!currentCharacter) return null
-    const f1 = getMaxPreparedFormula(currentCharacter.class, currentCharacter.level)
-    const f2 = currentCharacter.class2 && currentCharacter.level2
-      ? getMaxPreparedFormula(currentCharacter.class2, currentCharacter.level2)
-      : null
-    const parts = [f1, f2].filter(Boolean)
-    return parts.length > 0 ? parts.join(' + ') : null
+    const n1 = getMaxPrepared(currentCharacter.class, currentCharacter.level) ?? 0
+    const n2 = currentCharacter.class2 && currentCharacter.level2
+      ? getMaxPrepared(currentCharacter.class2, currentCharacter.level2) ?? 0
+      : 0
+    return n1 + n2 || null
   }, [currentCharacter])
 
   function handleAdd(spell: Spell) {
@@ -200,9 +199,9 @@ export function SpellbookPage() {
             <Flame className="h-3 w-3 fill-orange-400 text-orange-400" />
             Preparati ({preparedCount}) + Trucchetti
           </p>
-          {prepFormula && (
+          {maxPrepared != null && (
             <span className="text-[10px] text-muted-foreground/70 shrink-0">
-              max: <span className="font-semibold text-primary/70">{prepFormula}</span>
+              max: <span className="font-semibold text-primary/70">{maxPrepared}</span>
             </span>
           )}
         </div>

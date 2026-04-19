@@ -9,9 +9,10 @@ interface SpellListProps {
   spellIdsInList: Set<string>
   loading: boolean
   onAdd: (spell: Spell) => void
+  onRemove?: (spell: Spell) => void
 }
 
-export function SpellList({ spells, spellIdsInList, loading, onAdd }: SpellListProps) {
+export function SpellList({ spells, spellIdsInList, loading, onAdd, onRemove }: SpellListProps) {
   const [detailSpell, setDetailSpell] = useState<Spell | null>(null)
 
   if (loading) {
@@ -39,6 +40,7 @@ export function SpellList({ spells, spellIdsInList, loading, onAdd }: SpellListP
             spell={spell}
             isInList={spellIdsInList.has(spell.id)}
             onAdd={onAdd}
+            onRemove={onRemove}
             onViewDetail={setDetailSpell}
           />
         ))}

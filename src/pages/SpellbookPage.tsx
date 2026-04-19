@@ -83,6 +83,7 @@ export function SpellbookPage() {
   }, [currentCharacter?.id, slotsLoading])
 
   const spellIdsInList = useMemo(() => new Set(charSpells.map(cs => cs.spell_id)), [charSpells])
+  const spellIdToCharSpellId = useMemo(() => new Map(charSpells.map(cs => [cs.spell_id, cs.id])), [charSpells])
 
   const multi = isMulticlass(currentCharacter?.class2)
 
@@ -291,6 +292,10 @@ export function SpellbookPage() {
         spellIdsInList={spellIdsInList}
         loading={spellsLoading}
         onAdd={handleAdd}
+        onRemove={(spell) => {
+          const id = spellIdToCharSpellId.get(spell.id)
+          if (id) removeSpell.mutate(id)
+        }}
       />
     </div>
   )

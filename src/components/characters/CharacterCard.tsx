@@ -22,23 +22,24 @@ export function CharacterCard({ character, isActive, onEdit, onDelete }: Charact
   const classColor = CLASS_COLORS[character.class] ?? 'bg-muted text-muted-foreground border-muted'
   const classIcon  = CLASS_ICONS[character.class]  ?? '🧙'
 
+  const blockSwipe = useRef(false)
+
   const handlers = useSwipeable({
     onSwiping: ({ deltaX: dx }) => {
+      if (blockSwipe.current) return
       if (swiped) {
-        // già aperto: permetti di chiuderlo swipando a destra
-        const offset = Math.min(0, -DELETE_WIDTH + Math.max(0, dx))
-        setDeltaX(offset)
+        setDeltaX(Math.min(0, -DELETE_WIDTH + Math.max(0, dx)))
       } else {
-        // chiuso: permetti di aprirlo swipando a sinistra
-        const offset = Math.min(0, dx)
-        setDeltaX(offset)
+        setDeltaX(Math.min(0, dx))
       }
     },
     onSwipedLeft: () => {
+      if (blockSwipe.current) return
       setSwiped(true)
       setDeltaX(-DELETE_WIDTH)
     },
     onSwipedRight: () => {
+      if (blockSwipe.current) return
       setSwiped(false)
       setDeltaX(0)
     },
@@ -79,6 +80,10 @@ export function CharacterCard({ character, isActive, onEdit, onDelete }: Charact
 
       {/* Card principale */}
       <div
+        {...handlers}
+        onTouchStart={(e) => {
+          blockSwipe.current = !!(e.target as HTMLElement).closest('button')
+        }}
         className={cn(
           'relative bg-card border rounded-xl cursor-pointer active:brightness-95',
           isActive
@@ -96,8 +101,7 @@ export function CharacterCard({ character, isActive, onEdit, onDelete }: Charact
 
         <div className="p-5">
           <div className="flex items-start justify-between gap-2 mb-4">
-            {/* Zona swipe: solo info personaggio, non il bottone matita */}
-            <div {...handlers} className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
               <div className={cn('flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-2xl border', classColor)}>
                 {classIcon}
               </div>

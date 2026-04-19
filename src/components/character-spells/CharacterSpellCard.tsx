@@ -27,21 +27,24 @@ export function CharacterSpellCard({ charSpell, characterId, onRemove }: Charact
   const isCantrip = spell.level === 0
   const borderColor = SCHOOL_BORDER[spell.school] ?? 'border-l-border'
 
+  const blockSwipe = useRef(false)
+
   const handlers = useSwipeable({
     onSwiping: ({ deltaX: dx }) => {
+      if (blockSwipe.current) return
       if (swiped) {
-        const offset = Math.min(0, -DELETE_WIDTH + Math.max(0, dx))
-        setDeltaX(offset)
+        setDeltaX(Math.min(0, -DELETE_WIDTH + Math.max(0, dx)))
       } else {
-        const offset = Math.min(0, dx)
-        setDeltaX(offset)
+        setDeltaX(Math.min(0, dx))
       }
     },
     onSwipedLeft: () => {
+      if (blockSwipe.current) return
       setSwiped(true)
       setDeltaX(-DELETE_WIDTH)
     },
     onSwipedRight: () => {
+      if (blockSwipe.current) return
       setSwiped(false)
       setDeltaX(0)
     },
@@ -77,6 +80,10 @@ export function CharacterSpellCard({ charSpell, characterId, onRemove }: Charact
 
         {/* Card principale */}
         <div
+          {...handlers}
+          onTouchStart={(e) => {
+            blockSwipe.current = !!(e.target as HTMLElement).closest('button')
+          }}
           className={cn(
             'relative border border-border/60 bg-card border-l-2',
             borderColor,
@@ -99,9 +106,8 @@ export function CharacterSpellCard({ charSpell, characterId, onRemove }: Charact
               {formatLevel(spell.level)}
             </div>
 
-            {/* Info — swipe handler solo qui, lontano dai bottoni */}
+            {/* Info */}
             <div
-              {...handlers}
               className="min-w-0 flex-1 cursor-pointer"
               onClick={() => { if (!swiped) setShowDetail(true) }}
             >

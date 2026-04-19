@@ -1,4 +1,4 @@
-import { Wand2, Check } from 'lucide-react'
+import { Wand2, Check, X } from 'lucide-react'
 import { SCHOOL_COLORS, SCHOOL_BORDER, formatLevel, cn } from '@/lib/utils'
 import type { Spell } from '@/types'
 
@@ -6,10 +6,11 @@ interface SpellCardProps {
   spell: Spell
   isInList: boolean
   onAdd: (spell: Spell) => void
+  onRemove?: (spell: Spell) => void
   onViewDetail: (spell: Spell) => void
 }
 
-export function SpellCard({ spell, isInList, onAdd, onViewDetail }: SpellCardProps) {
+export function SpellCard({ spell, isInList, onAdd, onRemove, onViewDetail }: SpellCardProps) {
   const borderColor = SCHOOL_BORDER[spell.school] ?? 'border-l-border'
 
   return (
@@ -43,16 +44,22 @@ export function SpellCard({ spell, isInList, onAdd, onViewDetail }: SpellCardPro
         <p className="mt-0.5 text-[11px] text-muted-foreground leading-snug">{spell.casting_time}</p>
       </div>
 
-      {/* Aggiungi */}
+      {/* Aggiungi / Rimuovi */}
       <button
         className={cn(
-          'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border transition-all',
-          isInList
+          'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border transition-all active:scale-95',
+          isInList && onRemove
+            ? 'border-primary/30 bg-primary/10 text-primary hover:border-destructive/50 hover:bg-destructive/10 hover:text-destructive'
+            : isInList
             ? 'border-primary/30 bg-primary/10 text-primary cursor-default'
-            : 'border-border/60 text-muted-foreground hover:border-primary/50 hover:text-primary hover:bg-primary/10 active:scale-95',
+            : 'border-border/60 text-muted-foreground hover:border-primary/50 hover:text-primary hover:bg-primary/10',
         )}
-        onClick={(e) => { e.stopPropagation(); if (!isInList) onAdd(spell) }}
-        title={isInList ? 'Già nel libro' : 'Aggiungi al libro degli incantesimi'}
+        onClick={(e) => {
+          e.stopPropagation()
+          if (isInList && onRemove) onRemove(spell)
+          else if (!isInList) onAdd(spell)
+        }}
+        title={isInList ? 'Rimuovi dal libro' : 'Aggiungi al libro'}
       >
         {isInList ? <Check className="h-4 w-4" /> : <Wand2 className="h-4 w-4" />}
       </button>

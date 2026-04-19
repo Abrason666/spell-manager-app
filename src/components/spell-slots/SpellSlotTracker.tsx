@@ -1,7 +1,7 @@
 import { Moon, Gem } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SpellSlotRow } from './SpellSlotRow'
-import { useLongRest, useSyncSlots } from '@/hooks/useSpellSlots'
+import { useLongRest } from '@/hooks/useSpellSlots'
 import { Spinner } from '@/components/ui/spinner'
 import { getMulticlassSlots, CLASS_LABELS, isMulticlass } from '@/lib/utils'
 import type { SpellSlot, Character } from '@/types'
@@ -14,8 +14,7 @@ interface SpellSlotTrackerProps {
 }
 
 export function SpellSlotTracker({ slots, characterId, character, loading }: SpellSlotTrackerProps) {
-  const longRest  = useLongRest(characterId)
-  const syncSlots = useSyncSlots(characterId)
+  const longRest = useLongRest(characterId)
 
   if (loading) return <div className="flex justify-center py-6"><Spinner className="text-primary" /></div>
   if (!character) return null
@@ -29,14 +28,6 @@ export function SpellSlotTracker({ slots, characterId, character, loading }: Spe
   const totalAvailable = slots.reduce((s, sl) => s + (sl.max_slots - sl.used_slots), 0)
   const totalMax       = slots.reduce((s, sl) => s + sl.max_slots, 0)
 
-  function handleSync() {
-    if (!character || !slots.length) return
-    syncSlots.mutate({
-      slots,
-      mainArray: mainSlots,
-      pactArray: pactSlots,
-    })
-  }
 
   return (
     <div className="rounded-xl border border-border/60 bg-card overflow-hidden">

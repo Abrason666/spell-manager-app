@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { Trash2, ChevronUp, Flame, Feather } from 'lucide-react'
-import { useSwipeable } from 'react-swipeable'
+import { useDrag } from '@use-gesture/react'
 import { SpellNotesEditor } from './SpellNotesEditor'
 import { SpellDetailModal } from '@/components/spells/SpellDetailModal'
 import { useTogglePrepared } from '@/hooks/useCharacterSpells'
@@ -19,46 +19,41 @@ export function CharacterSpellCard({ charSpell, characterId, onRemove }: Charact
   const { spell } = charSpell
   const [showNotes, setShowNotes] = useState(false)
   const [showDetail, setShowDetail] = useState(false)
-  const [swiped, setSwiped] = useState(false)
-  const [deltaX, setDeltaX] = useState(0)
+  const [offsetX, setOffsetX] = useState(0)
   const togglePrepared = useTogglePrepared(characterId)
+  const isDragging = useRef(false)
 
   const isPrepared = charSpell.is_prepared
   const isCantrip = spell.level === 0
   const borderColor = SCHOOL_BORDER[spell.school] ?? 'border-l-border'
+  const isOpen = offsetX <= -DELETE_WIDTH / 2
 
-  const blockSwipe = useRef(false)
+  const bind = useDrag(({ movement: [mx], dragging, cancel, event }) => {
+    // Blocca se il touch parte su un bottone
+    if ((event.target as HTMLElement).closest('button')) { cancel(); return }
 
-  const handlers = useSwipeable({
-    onSwiping: ({ deltaX: dx }) => {
-      if (blockSwipe.current) return
-      if (swiped) {
-        setDeltaX(Math.min(0, -DELETE_WIDTH + Math.max(0, dx)))
-      } else {
-        setDeltaX(Math.min(0, dx))
-      }
-    },
-    onSwipedLeft: () => {
-      if (blockSwipe.current) return
-      setSwiped(true)
-      setDeltaX(-DELETE_WIDTH)
-    },
-    onSwipedRight: () => {
-      if (blockSwipe.current) return
-      setSwiped(false)
-      setDeltaX(0)
-    },
-    onTouchEndOrOnMouseUp: () => {
-      if (!swiped && deltaX > -DELETE_WIDTH / 2) {
-        setDeltaX(0)
-      } else if (swiped && deltaX < -DELETE_WIDTH / 2) {
-        setDeltaX(-DELETE_WIDTH)
-      }
-    },
-    preventScrollOnSwipe: true,
-    trackMouse: false,
-    delta: 10,
+    isDragging.current = !!dragging
+
+    if (dragging) {
+      const base = isOpen ? -DELETE_WIDTH : 0
+      const next = Math.max(-DELETE_WIDTH, Math.min(0, base + mx))
+      setOffsetX(next)
+    } else {
+      // Al rilascio: snap aperto o chiuso
+      setOffsetX(isOpen ? -DELETE_WIDTH : 0)
+    }
+  }, {
+    axis: 'x',
+    filterTaps: true,
+    rubberband: true,
+    from: () => [isOpen ? -DELETE_WIDTH : 0, 0],
   })
+
+  function onInfoClick() {
+    if (isDragging.current) return
+    if (isOpen) { setOffsetX(0); return }
+    setShowDetail(true)
+  }
 
   return (
     <>
@@ -71,7 +66,7 @@ export function CharacterSpellCard({ charSpell, characterId, onRemove }: Charact
         >
           <button
             className="flex flex-col items-center gap-1 text-white"
-            onClick={() => { setSwiped(false); setDeltaX(0); onRemove(charSpell.id) }}
+            onClick={() => { setOffsetX(0); onRemove(charSpell.id) }}
           >
             <Trash2 className="h-4 w-4" />
             <span className="text-[10px] font-medium">Rimuovi</span>
@@ -80,18 +75,15 @@ export function CharacterSpellCard({ charSpell, characterId, onRemove }: Charact
 
         {/* Card principale */}
         <div
-          {...handlers}
-          onTouchStart={(e) => {
-            blockSwipe.current = !!(e.target as HTMLElement).closest('button')
-          }}
+          {...bind()}
           className={cn(
-            'relative border border-border/60 bg-card border-l-2',
+            'relative border border-border/60 bg-card border-l-2 touch-pan-y',
             borderColor,
             isPrepared && !isCantrip && 'border-primary/60 ring-1 ring-primary/20',
           )}
           style={{
-            transform: `translateX(${swiped ? -DELETE_WIDTH : deltaX}px)`,
-            transition: deltaX === 0 || deltaX === -DELETE_WIDTH ? 'transform 0.2s ease' : 'none',
+            transform: `translateX(${offsetX}px)`,
+            transition: isDragging.current ? 'none' : 'transform 0.2s ease',
           }}
         >
           <div className="flex items-center gap-3 px-3 py-3.5">
@@ -107,10 +99,7 @@ export function CharacterSpellCard({ charSpell, characterId, onRemove }: Charact
             </div>
 
             {/* Info */}
-            <div
-              className="min-w-0 flex-1 cursor-pointer"
-              onClick={() => { if (!swiped) setShowDetail(true) }}
-            >
+            <div className="min-w-0 flex-1 cursor-pointer" onClick={onInfoClick}>
               <p className="font-medium text-sm leading-tight truncate">{spell.name}</p>
               <div className="mt-1.5 flex items-center gap-2">
                 <span className={cn('inline-flex items-center rounded px-1.5 py-0.5 text-[11px] font-medium shrink-0', SCHOOL_COLORS[spell.school] ?? 'bg-muted text-muted-foreground')}>
@@ -136,15 +125,13 @@ export function CharacterSpellCard({ charSpell, characterId, onRemove }: Charact
                   )}
                   onClick={() => togglePrepared.mutate({ id: charSpell.id, isPrepared: !isPrepared })}
                   disabled={togglePrepared.isPending}
-                  title={isPrepared ? 'Rimuovi dalla preparazione' : 'Segna come preparato'}
                 >
                   <Flame className={cn('h-4 w-4', isPrepared && 'fill-orange-400')} />
                 </button>
               )}
               <button
                 className="flex h-10 w-10 items-center justify-center rounded-lg border border-border/50 text-muted-foreground hover:text-foreground hover:border-border transition-all active:scale-95"
-                onClick={() => { if (!swiped) setShowNotes(!showNotes) }}
-                title="Note personali"
+                onClick={() => { if (!isOpen) setShowNotes(!showNotes) }}
               >
                 {showNotes ? <ChevronUp className="h-4 w-4" /> : <Feather className="h-4 w-4" />}
               </button>

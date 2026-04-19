@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useSwipeable } from 'react-swipeable'
+import { useDrag } from '@use-gesture/react'
 import { CLASS_LABELS, CLASS_ICONS, CLASS_COLORS, cn } from '@/lib/utils'
 import type { Character } from '@/types'
 
@@ -16,48 +16,35 @@ const DELETE_WIDTH = 80
 
 export function CharacterCard({ character, isActive, onEdit, onDelete }: CharacterCardProps) {
   const navigate = useNavigate()
-  const [swiped, setSwiped] = useState(false)
-  const [deltaX, setDeltaX] = useState(0)
+  const [offsetX, setOffsetX] = useState(0)
+  const isDragging = useRef(false)
 
   const classColor = CLASS_COLORS[character.class] ?? 'bg-muted text-muted-foreground border-muted'
   const classIcon  = CLASS_ICONS[character.class]  ?? '🧙'
+  const isOpen = offsetX <= -DELETE_WIDTH / 2
 
-  const blockSwipe = useRef(false)
+  const bind = useDrag(({ movement: [mx], dragging, cancel, event }) => {
+    if ((event.target as HTMLElement).closest('button')) { cancel(); return }
 
-  const handlers = useSwipeable({
-    onSwiping: ({ deltaX: dx }) => {
-      if (blockSwipe.current) return
-      if (swiped) {
-        setDeltaX(Math.min(0, -DELETE_WIDTH + Math.max(0, dx)))
-      } else {
-        setDeltaX(Math.min(0, dx))
-      }
-    },
-    onSwipedLeft: () => {
-      if (blockSwipe.current) return
-      setSwiped(true)
-      setDeltaX(-DELETE_WIDTH)
-    },
-    onSwipedRight: () => {
-      if (blockSwipe.current) return
-      setSwiped(false)
-      setDeltaX(0)
-    },
-    onTouchEndOrOnMouseUp: () => {
-      // snap: se non ha superato la soglia, torna alla posizione corrente
-      if (!swiped && deltaX > -DELETE_WIDTH / 2) {
-        setDeltaX(0)
-      } else if (swiped && deltaX < -DELETE_WIDTH / 2) {
-        setDeltaX(-DELETE_WIDTH)
-      }
-    },
-    preventScrollOnSwipe: true,
-    trackMouse: false,
-    delta: 10,
+    isDragging.current = !!dragging
+
+    if (dragging) {
+      const base = isOpen ? -DELETE_WIDTH : 0
+      const next = Math.max(-DELETE_WIDTH, Math.min(0, base + mx))
+      setOffsetX(next)
+    } else {
+      setOffsetX(isOpen ? -DELETE_WIDTH : 0)
+    }
+  }, {
+    axis: 'x',
+    filterTaps: true,
+    rubberband: true,
+    from: () => [isOpen ? -DELETE_WIDTH : 0, 0],
   })
 
   function onCardClick() {
-    if (swiped) { setSwiped(false); setDeltaX(0); return }
+    if (isDragging.current) return
+    if (isOpen) { setOffsetX(0); return }
     navigate(`/spellbook/${character.id}`)
   }
 
@@ -71,7 +58,7 @@ export function CharacterCard({ character, isActive, onEdit, onDelete }: Charact
       >
         <button
           className="flex flex-col items-center gap-1 text-white"
-          onClick={(e) => { e.stopPropagation(); setSwiped(false); setDeltaX(0); onDelete(character) }}
+          onClick={() => { setOffsetX(0); onDelete(character) }}
         >
           <Trash2 className="h-5 w-5" />
           <span className="text-[10px] font-medium">Elimina</span>
@@ -80,23 +67,19 @@ export function CharacterCard({ character, isActive, onEdit, onDelete }: Charact
 
       {/* Card principale */}
       <div
-        {...handlers}
-        onTouchStart={(e) => {
-          blockSwipe.current = !!(e.target as HTMLElement).closest('button')
-        }}
+        {...bind()}
         className={cn(
-          'relative bg-card border rounded-xl cursor-pointer active:brightness-95',
+          'relative bg-card border rounded-xl cursor-pointer active:brightness-95 touch-pan-y',
           isActive
             ? 'border-primary/60 shadow-[0_0_20px_hsl(var(--primary)/0.15)]'
             : 'border-border/60 hover:border-border',
         )}
         style={{
-          transform: `translateX(${swiped ? -DELETE_WIDTH : deltaX}px)`,
-          transition: deltaX === 0 || deltaX === -DELETE_WIDTH ? 'transform 0.2s ease' : 'none',
+          transform: `translateX(${offsetX}px)`,
+          transition: isDragging.current ? 'none' : 'transform 0.2s ease',
         }}
         onClick={onCardClick}
       >
-        {/* Striscia colore top */}
         <div className={cn('h-1 w-full rounded-t-xl', isActive ? 'bg-primary' : 'bg-border/40')} />
 
         <div className="p-5">
@@ -122,8 +105,7 @@ export function CharacterCard({ character, isActive, onEdit, onDelete }: Charact
                 'border-border/60 text-muted-foreground hover:text-foreground hover:border-border',
                 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100',
               )}
-              onClick={(e) => { e.stopPropagation(); setSwiped(false); setDeltaX(0); onEdit(character) }}
-              title="Modifica personaggio"
+              onClick={(e) => { e.stopPropagation(); setOffsetX(0); onEdit(character) }}
             >
               <Pencil className="h-3.5 w-3.5" />
             </button>

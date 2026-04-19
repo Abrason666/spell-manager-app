@@ -80,7 +80,7 @@ export function CharacterSpellCard({ charSpell, characterId, onRemove }: Charact
           className={cn(
             'relative border border-border/60 bg-card border-l-2',
             borderColor,
-            isPrepared && !isCantrip && 'bg-primary/5 border-primary/50 shadow-[0_0_8px_hsl(var(--primary)/0.15)]',
+            isPrepared && !isCantrip && 'border-primary/60 ring-1 ring-primary/20',
           )}
           style={{
             transform: `translateX(${swiped ? -DELETE_WIDTH : deltaX}px)`,

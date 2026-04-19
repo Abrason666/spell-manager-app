@@ -157,7 +157,7 @@ export const SPELL_SLOTS_TABLE: Record<string, Record<number, number[]>> = {
 // Contributo al caster level combinato (warlock = 0, tiene slot separati)
 function multiclassCasterLevel(cls: string, level: number): number {
   if (['bard', 'cleric', 'druid', 'sorcerer', 'wizard'].includes(cls)) return level
-  if (['paladin', 'ranger'].includes(cls)) return Math.floor(level / 2)
+  if (['paladin', 'ranger'].includes(cls)) return Math.ceil(level / 2)
   return 0 // warlock e non-caster non contribuiscono al pool condiviso
 }
 

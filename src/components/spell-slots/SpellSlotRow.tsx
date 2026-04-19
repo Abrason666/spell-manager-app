@@ -26,7 +26,7 @@ export function SpellSlotRow({ slot, characterId }: SpellSlotRowProps) {
       </div>
 
       {/* Cerchi visivi */}
-      <div className="flex flex-1 flex-wrap gap-2 min-w-0">
+      <div className="flex flex-1 flex-wrap gap-2.5 min-w-0">
         {Array.from({ length: slot.max_slots }).map((_, i) => {
           const isAvailable = i < available
           return (
@@ -40,7 +40,7 @@ export function SpellSlotRow({ slot, characterId }: SpellSlotRowProps) {
                   : recoverSlot.mutate({ slotId: slot.id, usedSlots: slot.used_slots })
               }
               className={cn(
-                'h-6 w-6 rounded-full border-2 transition-all duration-150 disabled:opacity-40',
+                'h-7 w-7 rounded-full border-2 transition-all duration-150 disabled:opacity-40',
                 isAvailable
                   ? 'border-primary bg-primary/75 hover:bg-primary shadow-[0_0_8px_hsl(var(--primary)/0.45)] active:scale-90'
                   : 'border-muted-foreground/30 bg-transparent hover:border-primary/40 active:scale-90',

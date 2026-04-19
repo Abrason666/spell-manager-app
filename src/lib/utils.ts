@@ -207,3 +207,30 @@ export function getMulticlassSlots(
 export function isMulticlass(cls2: string | null | undefined): cls2 is string {
   return !!cls2
 }
+
+// ── Max spell preparabili per classe ──────────────────────────────────────────
+// Classi con preparazione: Cleric (SAG), Druid (SAG), Wizard (INT),
+// Paladin (CAR, mezzo livello), Ranger (SAG, mezzo livello).
+// Bard/Sorcerer/Warlock = incantesimi noti, nessuna preparazione.
+
+const PREP_MOD: Record<string, { mod: string; half: boolean } | null> = {
+  cleric:   { mod: 'SAG', half: false },
+  druid:    { mod: 'SAG', half: false },
+  wizard:   { mod: 'INT', half: false },
+  paladin:  { mod: 'CAR', half: true },
+  ranger:   { mod: 'SAG', half: true },
+  bard:     null,
+  sorcerer: null,
+  warlock:  null,
+}
+
+/**
+ * Restituisce la formula testuale del massimo di spell preparabili,
+ * es. "SAG + 5" per un Druid 5. Null per classi senza preparazione.
+ */
+export function getMaxPreparedFormula(cls: string, level: number): string | null {
+  const entry = PREP_MOD[cls]
+  if (!entry) return null
+  const lv = entry.half ? Math.floor(level / 2) : level
+  return `${entry.mod} + ${lv}`
+}

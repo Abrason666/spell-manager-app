@@ -16,7 +16,7 @@ import { useCharacters, useUpdateCharacter } from '@/hooks/useCharacters'
 import { useUIStore } from '@/stores/uiStore'
 import { useFilterStore } from '@/stores/filterStore'
 import { useAuth } from '@/hooks/useAuth'
-import { isMulticlass, CLASS_ICONS, cn } from '@/lib/utils'
+import { isMulticlass, CLASS_ICONS, cn, getMaxPreparedFormula } from '@/lib/utils'
 import { ClassChipSwitcher } from '@/components/ui/ClassChipSwitcher'
 import type { ClassFilter } from '@/components/ui/ClassChipSwitcher'
 import type { Spell } from '@/types'
@@ -122,6 +122,16 @@ export function SpellbookPage() {
     [charSpells]
   )
 
+  const prepFormula = useMemo(() => {
+    if (!currentCharacter) return null
+    const f1 = getMaxPreparedFormula(currentCharacter.class, currentCharacter.level)
+    const f2 = currentCharacter.class2 && currentCharacter.level2
+      ? getMaxPreparedFormula(currentCharacter.class2, currentCharacter.level2)
+      : null
+    const parts = [f1, f2].filter(Boolean)
+    return parts.length > 0 ? parts.join(' + ') : null
+  }, [currentCharacter])
+
   function handleAdd(spell: Spell) {
     if (!currentCharId) return
     addSpell.mutate(spell.id)
@@ -185,10 +195,17 @@ export function SpellbookPage() {
         loading={slotsLoading}
       />
       <div>
-        <p className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
-          <Flame className="h-3 w-3 fill-orange-400 text-orange-400" />
-          Preparati ({preparedCount}) + Trucchetti
-        </p>
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+            <Flame className="h-3 w-3 fill-orange-400 text-orange-400" />
+            Preparati ({preparedCount}) + Trucchetti
+          </p>
+          {prepFormula && (
+            <span className="text-[10px] text-muted-foreground/70 shrink-0">
+              max: <span className="font-semibold text-primary/70">{prepFormula}</span>
+            </span>
+          )}
+        </div>
         {charSpellsLoading ? (
           <div className="flex h-24 items-center justify-center text-muted-foreground text-sm">Caricamento...</div>
         ) : sessioneSpells.length === 0 ? (

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Trash2, ChevronUp, Flame, Feather } from 'lucide-react'
 import { useSwipeable } from 'react-swipeable'
 import { SpellNotesEditor } from './SpellNotesEditor'

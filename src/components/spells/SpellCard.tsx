@@ -1,4 +1,4 @@
-import { Wand2, Check, X } from 'lucide-react'
+import { Wand2, Check } from 'lucide-react'
 import { SCHOOL_COLORS, SCHOOL_BORDER, formatLevel, cn } from '@/lib/utils'
 import type { Spell } from '@/types'
 

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useSwipeable } from 'react-swipeable'

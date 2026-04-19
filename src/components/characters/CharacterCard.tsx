@@ -1,6 +1,7 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useSwipeable } from 'react-swipeable'
 import { CLASS_LABELS, CLASS_ICONS, CLASS_COLORS, cn } from '@/lib/utils'
 import type { Character } from '@/types'
 
@@ -11,55 +12,65 @@ interface CharacterCardProps {
   onDelete: (character: Character) => void
 }
 
-const DELETE_WIDTH = 80   // px largezza del pannello cestino
-const SWIPE_THRESHOLD = 50 // px minimi per attivare lo swipe
+const DELETE_WIDTH = 80
 
 export function CharacterCard({ character, isActive, onEdit, onDelete }: CharacterCardProps) {
   const navigate = useNavigate()
   const [swiped, setSwiped] = useState(false)
-
-  const touchStartX = useRef(0)
-  const touchStartY = useRef(0)
-  const didSwipe = useRef(false)
+  const [deltaX, setDeltaX] = useState(0)
 
   const classColor = CLASS_COLORS[character.class] ?? 'bg-muted text-muted-foreground border-muted'
   const classIcon  = CLASS_ICONS[character.class]  ?? '🧙'
 
-  /* ── Touch handlers ────────────────────────────────────────────────────── */
-  function onTouchStart(e: React.TouchEvent) {
-    touchStartX.current = e.touches[0].clientX
-    touchStartY.current = e.touches[0].clientY
-    didSwipe.current = false
-  }
-
-  function onTouchEnd(e: React.TouchEvent) {
-    const dx = e.changedTouches[0].clientX - touchStartX.current
-    const dy = e.changedTouches[0].clientY - touchStartY.current
-    if (Math.abs(dx) < Math.abs(dy)) return   // scroll verticale, ignora
-    if (Math.abs(dx) < SWIPE_THRESHOLD) return
-
-    didSwipe.current = true
-    setSwiped(dx < 0)  // sinistra → apri; destra → chiudi
-  }
+  const handlers = useSwipeable({
+    onSwiping: ({ deltaX: dx }) => {
+      if (swiped) {
+        // già aperto: permetti di chiuderlo swipando a destra
+        const offset = Math.min(0, -DELETE_WIDTH + Math.max(0, dx))
+        setDeltaX(offset)
+      } else {
+        // chiuso: permetti di aprirlo swipando a sinistra
+        const offset = Math.min(0, dx)
+        setDeltaX(offset)
+      }
+    },
+    onSwipedLeft: () => {
+      setSwiped(true)
+      setDeltaX(-DELETE_WIDTH)
+    },
+    onSwipedRight: () => {
+      setSwiped(false)
+      setDeltaX(0)
+    },
+    onTouchEndOrOnMouseUp: () => {
+      // snap: se non ha superato la soglia, torna alla posizione corrente
+      if (!swiped && deltaX > -DELETE_WIDTH / 2) {
+        setDeltaX(0)
+      } else if (swiped && deltaX < -DELETE_WIDTH / 2) {
+        setDeltaX(-DELETE_WIDTH)
+      }
+    },
+    preventScrollOnSwipe: true,
+    trackMouse: false,
+    delta: 10,
+  })
 
   function onCardClick() {
-    if (didSwipe.current) { didSwipe.current = false; return }
-    if (swiped)            { setSwiped(false); return }
+    if (swiped) { setSwiped(false); setDeltaX(0); return }
     navigate(`/spellbook/${character.id}`)
   }
 
-  /* ── Render ────────────────────────────────────────────────────────────── */
   return (
     <div className="group relative overflow-hidden rounded-xl select-none">
 
-      {/* Pannello cestino (slide-in da destra) */}
+      {/* Pannello cestino */}
       <div
-        className="absolute inset-y-0 right-0 flex items-center justify-center bg-destructive transition-all duration-200"
+        className="absolute inset-y-0 right-0 flex items-center justify-center bg-destructive rounded-xl"
         style={{ width: DELETE_WIDTH }}
       >
         <button
           className="flex flex-col items-center gap-1 text-white"
-          onClick={(e) => { e.stopPropagation(); setSwiped(false); onDelete(character) }}
+          onClick={(e) => { e.stopPropagation(); setSwiped(false); setDeltaX(0); onDelete(character) }}
         >
           <Trash2 className="h-5 w-5" />
           <span className="text-[10px] font-medium">Elimina</span>
@@ -68,23 +79,23 @@ export function CharacterCard({ character, isActive, onEdit, onDelete }: Charact
 
       {/* Card principale */}
       <div
+        {...handlers}
         className={cn(
-          'relative bg-card border rounded-xl transition-transform duration-200 cursor-pointer active:brightness-95',
+          'relative bg-card border rounded-xl cursor-pointer active:brightness-95',
           isActive
             ? 'border-primary/60 shadow-[0_0_20px_hsl(var(--primary)/0.15)]'
             : 'border-border/60 hover:border-border',
-          swiped ? `-translate-x-[${DELETE_WIDTH}px]` : 'translate-x-0',
         )}
-        style={{ transform: swiped ? `translateX(-${DELETE_WIDTH}px)` : 'translateX(0)' }}
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
+        style={{
+          transform: `translateX(${swiped ? -DELETE_WIDTH : deltaX}px)`,
+          transition: deltaX === 0 || deltaX === -DELETE_WIDTH ? 'transform 0.2s ease' : 'none',
+        }}
         onClick={onCardClick}
       >
         {/* Striscia colore top */}
         <div className={cn('h-1 w-full rounded-t-xl', isActive ? 'bg-primary' : 'bg-border/40')} />
 
         <div className="p-5">
-          {/* Header */}
           <div className="flex items-start justify-between gap-2 mb-4">
             <div className="flex items-center gap-3 min-w-0">
               <div className={cn('flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-2xl border', classColor)}>
@@ -101,14 +112,13 @@ export function CharacterCard({ character, isActive, onEdit, onDelete }: Charact
               </div>
             </div>
 
-            {/* Matita — sempre visibile su mobile, hover su desktop */}
             <button
               className={cn(
                 'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-colors',
                 'border-border/60 text-muted-foreground hover:text-foreground hover:border-border',
                 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100',
               )}
-              onClick={(e) => { e.stopPropagation(); setSwiped(false); onEdit(character) }}
+              onClick={(e) => { e.stopPropagation(); setSwiped(false); setDeltaX(0); onEdit(character) }}
               title="Modifica personaggio"
             >
               <Pencil className="h-3.5 w-3.5" />

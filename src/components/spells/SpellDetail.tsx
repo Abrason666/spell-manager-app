@@ -1,5 +1,27 @@
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import type { Components } from 'react-markdown'
 import { SCHOOL_COLORS, formatLevelLabel, cn } from '@/lib/utils'
 import type { Spell } from '@/types'
+
+const mdComponents: Components = {
+  p:      ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+  strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+  em:     ({ children }) => <em className="italic">{children}</em>,
+  ul:     ({ children }) => <ul className="list-disc list-inside mb-2 space-y-0.5">{children}</ul>,
+  ol:     ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-0.5">{children}</ol>,
+  li:     ({ children }) => <li className="text-sm">{children}</li>,
+  table:  ({ children }) => (
+    <div className="overflow-x-auto my-2 rounded-lg border border-border/60">
+      <table className="w-full text-sm border-collapse">{children}</table>
+    </div>
+  ),
+  thead:  ({ children }) => <thead className="bg-muted/60">{children}</thead>,
+  tbody:  ({ children }) => <tbody className="divide-y divide-border/40">{children}</tbody>,
+  tr:     ({ children }) => <tr>{children}</tr>,
+  th:     ({ children }) => <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">{children}</th>,
+  td:     ({ children }) => <td className="px-3 py-2">{children}</td>,
+}
 
 interface SpellDetailProps {
   spell: Spell
@@ -47,10 +69,10 @@ export function SpellDetail({ spell }: SpellDetailProps) {
       {spell.description ? (
         <div className="space-y-2">
           <h4 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Descrizione</h4>
-          <div className="text-sm text-foreground/80 space-y-2 leading-relaxed">
-            {spell.description.split('\n\n').map((para, i) => (
-              <p key={i}>{para}</p>
-            ))}
+          <div className="text-sm text-foreground/80 leading-relaxed prose-spell">
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+              {spell.description}
+            </ReactMarkdown>
           </div>
         </div>
       ) : (
@@ -61,7 +83,9 @@ export function SpellDetail({ spell }: SpellDetailProps) {
       {spell.higher_levels && (
         <div className="rounded-lg bg-primary/8 border border-primary/20 p-3 space-y-1">
           <h4 className="text-xs font-semibold uppercase tracking-widest text-primary">A livelli superiori</h4>
-          <p className="text-sm text-foreground/80">{spell.higher_levels}</p>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+            {spell.higher_levels}
+          </ReactMarkdown>
         </div>
       )}
     </div>

@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { BookOpen } from 'lucide-react'
 import { CharacterSpellCard } from './CharacterSpellCard'
 import { Spinner } from '@/components/ui/spinner'
-import { formatLevelLabel, cn } from '@/lib/utils'
+import { formatLevelLabel } from '@/lib/utils'
 import type { CharacterSpell } from '@/types'
 
 interface CharacterSpellListProps {

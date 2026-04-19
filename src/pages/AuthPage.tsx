@@ -7,7 +7,6 @@ import { GoogleOAuthButton } from '@/components/auth/GoogleOAuthButton'
 import { Spinner } from '@/components/ui/spinner'
 import { useThemeStore } from '@/stores/themeStore'
 import { Sword, Sun, Moon } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 export function AuthPage() {
   const { user, loading } = useAuth()

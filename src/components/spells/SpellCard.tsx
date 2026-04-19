@@ -40,7 +40,7 @@ export function SpellCard({ spell, isInList, onAdd, onViewDetail }: SpellCardPro
             {spell.ritual && <span className="text-[10px] font-bold text-purple-400 bg-purple-400/10 border border-purple-400/20 rounded px-1">R</span>}
           </div>
         </div>
-        <p className="mt-0.5 text-[11px] text-muted-foreground truncate">{spell.casting_time}</p>
+        <p className="mt-0.5 text-[11px] text-muted-foreground leading-snug">{spell.casting_time}</p>
       </div>
 
       {/* Aggiungi */}

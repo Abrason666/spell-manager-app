@@ -1,4 +1,4 @@
-import { Moon, Gem, Zap } from 'lucide-react'
+import { Moon, Gem } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SpellSlotRow } from './SpellSlotRow'
 import { useLongRest, useSyncSlots } from '@/hooks/useSpellSlots'
@@ -49,28 +49,16 @@ export function SpellSlotTracker({ slots, characterId, character, loading }: Spe
             <span className="text-xs text-muted-foreground tabular-nums">{totalAvailable}/{totalMax}</span>
           )}
         </div>
-        <div className="flex items-center gap-1">
-          <Button
-            size="sm" variant="ghost"
-            className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-primary px-2"
-            onClick={handleSync}
-            disabled={syncSlots.isPending}
-            title="Sincronizza slot con classe/livello"
-          >
-            <Zap className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Sincronizza</span>
-          </Button>
-          <Button
-            size="sm" variant="ghost"
-            className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-primary px-2"
-            onClick={() => longRest.mutate(slots)}
-            disabled={longRest.isPending}
-            title="Riposo lungo: recupera tutti gli slot"
-          >
-            <Moon className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Riposo lungo</span>
-          </Button>
-        </div>
+        <Button
+          size="sm" variant="ghost"
+          className="h-9 gap-2 text-sm text-muted-foreground hover:text-primary px-3"
+          onClick={() => longRest.mutate(slots)}
+          disabled={longRest.isPending}
+          title="Riposo lungo: recupera tutti gli slot"
+        >
+          <Moon className="h-5 w-5" />
+          <span className="hidden sm:inline">Riposo lungo</span>
+        </Button>
       </div>
 
       {/* Slot principali — escludi posizioni pact-only */}

@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useCharacters } from '@/hooks/useCharacters'
 import { useUIStore } from '@/stores/uiStore'
-import { useThemeStore } from '@/stores/themeStore'
 import { useAuth } from '@/hooks/useAuth'
 import { CLASS_LABELS, CLASS_ICONS } from '@/lib/utils'
 

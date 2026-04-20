@@ -27,7 +27,7 @@ export function SessioneSpellCard({ charSpell, canCast, classDot }: SessioneSpel
       >
         <div className="flex items-center gap-3 px-3 py-3.5">
           {/* Livello */}
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 border border-primary/20 text-primary text-sm font-bold font-fantasy">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold font-fantasy">
             {formatLevel(spell.level)}
           </div>
 
@@ -45,8 +45,8 @@ export function SessioneSpellCard({ charSpell, canCast, classDot }: SessioneSpel
               </div>
               <span className="text-[11px] text-muted-foreground">{spell.casting_time}</span>
               <div className="flex gap-1">
-                {spell.concentration && <span className="text-[10px] font-bold text-yellow-400 bg-yellow-400/10 border border-yellow-400/20 rounded px-1">C</span>}
-                {spell.ritual && <span className="text-[10px] font-bold text-purple-400 bg-purple-400/10 border border-purple-400/20 rounded px-1">R</span>}
+                {spell.concentration && <span className="text-[10px] font-bold text-amber-700 bg-amber-100 border border-amber-300 dark:text-yellow-400 dark:bg-yellow-400/10 dark:border-yellow-400/20 rounded px-1">C</span>}
+                {spell.ritual && <span className="text-[10px] font-bold text-violet-700 bg-violet-100 border border-violet-300 dark:text-purple-400 dark:bg-purple-400/10 dark:border-purple-400/20 rounded px-1">R</span>}
               </div>
             </div>
           </div>

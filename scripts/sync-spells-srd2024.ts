@@ -78,9 +78,20 @@ function parseSpells(html: string): SpellRecord[] {
       if (!name) continue
 
       // Metadato: <em>Level X School (Classes)</em> o <em>School Cantrip (Classes)</em>
+      // Fallback: alcuni spell hanno il metadato in un <p> con markdown non convertito (_..._)
+      // o come testo nudo prima degli elenchi puntati
       const emMatch = block.match(/<em>([^<]+)<\/em>/)
-      if (!emMatch) continue
-      const meta = stripTags(emMatch[1]).trim()
+      let meta: string
+      if (emMatch) {
+        meta = stripTags(emMatch[1]).trim()
+      } else {
+        const pMatch = block.match(/<p[^>]*>([\s\S]*?)<\/p>/)
+        if (!pMatch) continue
+        // Prendi solo la prima riga (prima di \n* o * che indica l'inizio della lista)
+        const firstLine = pMatch[1].split(/\n?\s*\*/)[0]
+        meta = stripTags(firstLine).replace(/^_+|_+$/g, '').trim()
+        if (!meta) continue
+      }
 
       let level = 0
       let school = ''
@@ -126,7 +137,7 @@ function parseSpells(html: string): SpellRecord[] {
         }
       }
 
-      // Proprietà dalla lista <ul>
+      // Proprietà: prima prova <ul><li>, poi fallback su * Key: Value dentro un <p>
       const props: Record<string, string> = {}
       const liMatches = block.matchAll(/<li[^>]*>(.*?)<\/li>/gs)
       for (const m of liMatches) {
@@ -134,6 +145,19 @@ function parseSpells(html: string): SpellRecord[] {
         const propMatch = text.match(/^(\w[\w\s]+?):\s+(.+)$/)
         if (propMatch) {
           props[propMatch[1].trim()] = propMatch[2].trim()
+        }
+      }
+
+      // Fallback: se le <li> non hanno le proprietà standard, cerca nel primo <p>
+      const missingProps = !props['Casting Time'] && !props['Range']
+      if (missingProps) {
+        const firstPMatch = block.match(/<p[^>]*>([\s\S]*?)<\/p>/)
+        if (firstPMatch) {
+          for (const line of firstPMatch[1].split('\n')) {
+            const text = stripTags(line).trim()
+            const propMatch = text.match(/^\*?\s*(\w[\w\s]+?):\s+(.+)$/)
+            if (propMatch) props[propMatch[1].trim()] = propMatch[2].trim()
+          }
         }
       }
 
@@ -145,8 +169,12 @@ function parseSpells(html: string): SpellRecord[] {
       const concentration = duration.toLowerCase().startsWith('concentration')
       const ritual        = casting_time.toLowerCase().includes('ritual')
 
-      // Descrizione: tutti i <p> dopo il </ul>
-      const afterUl = block.split(/<\/ul>/)[1] ?? ''
+      // Descrizione: dopo </ul> se presente, altrimenti tutto tranne il primo <p>
+      // Se le props erano nel primo <p> (missingProps = true), rimuoviamo anche quel <p>
+      const hasUl = /<ul/i.test(block)
+      const afterUl = hasUl && !missingProps
+        ? (block.split(/<\/ul>/)[1] ?? '')
+        : block.replace(/<p[^>]*>[\s\S]*?<\/p>/, '') // rimuovi solo il primo <p>
       const paragraphs: string[] = []
       let higher_levels: string | null = null
 

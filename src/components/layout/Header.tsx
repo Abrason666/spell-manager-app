@@ -50,9 +50,12 @@ export function Header() {
               </p>
               <span className="hidden sm:block text-xs text-muted-foreground shrink-0">
                 — {CLASS_LABELS[activeChar.class] ?? activeChar.class} Lv. {activeChar.level}
+                {activeChar.class2 && activeChar.level2
+                  ? ` / ${CLASS_LABELS[activeChar.class2] ?? activeChar.class2} Lv. ${activeChar.level2}`
+                  : ''}
               </span>
               <span className="sm:hidden text-xs text-muted-foreground shrink-0">
-                Lv. {activeChar.level}
+                Lv. {activeChar.level}{activeChar.class2 && activeChar.level2 ? `+${activeChar.level2}` : ''}
               </span>
             </div>
           ) : null}

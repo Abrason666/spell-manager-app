@@ -68,6 +68,17 @@ export function useTogglePrepared(characterId: string | null) {
         .eq('id', id)
       if (error) throw error
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['character_spells', characterId] }),
+    onMutate: async ({ id, isPrepared }) => {
+      await qc.cancelQueries({ queryKey: ['character_spells', characterId] })
+      const prev = qc.getQueryData(['character_spells', characterId])
+      qc.setQueryData(['character_spells', characterId], (old: CharacterSpell[] | undefined) =>
+        old?.map(cs => cs.id === id ? { ...cs, is_prepared: isPrepared } : cs)
+      )
+      return { prev }
+    },
+    onError: (_err, _vars, ctx: { prev: unknown } | undefined) => {
+      if (ctx?.prev) qc.setQueryData(['character_spells', characterId], ctx.prev)
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['character_spells', characterId] }),
   })
 }

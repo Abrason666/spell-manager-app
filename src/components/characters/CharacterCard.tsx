@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useDrag } from '@use-gesture/react'
-import { CLASS_LABELS, CLASS_ICONS, CLASS_COLORS, cn } from '@/lib/utils'
+import { CLASS_LABELS, CLASS_ICONS, CLASS_COLORS, isMulticlass, cn } from '@/lib/utils'
 import type { Character } from '@/types'
 
 interface CharacterCardProps {
@@ -19,8 +19,11 @@ export function CharacterCard({ character, isActive, onEdit, onDelete }: Charact
   const [offsetX, setOffsetX] = useState(0)
   const isDragging = useRef(false)
 
-  const classColor = CLASS_COLORS[character.class] ?? 'bg-muted text-muted-foreground border-muted'
-  const classIcon  = CLASS_ICONS[character.class]  ?? '🧙'
+  const classColor  = CLASS_COLORS[character.class]  ?? 'bg-muted text-muted-foreground border-muted'
+  const classIcon   = CLASS_ICONS[character.class]   ?? '🧙'
+  const class2Color = CLASS_COLORS[character.class2 ?? ''] ?? 'bg-muted text-muted-foreground border-muted'
+  const class2Icon  = CLASS_ICONS[character.class2  ?? ''] ?? null
+  const multi = isMulticlass(character.class2)
   const isOpen = offsetX <= -DELETE_WIDTH / 2
 
   const bind = useDrag(({ movement: [mx], dragging, cancel, event }) => {
@@ -49,7 +52,7 @@ export function CharacterCard({ character, isActive, onEdit, onDelete }: Charact
   }
 
   return (
-    <div className="group relative overflow-hidden rounded-xl select-none">
+    <div className="group relative overflow-hidden rounded-xl select-none bg-card">
 
       {/* Pannello cestino */}
       <div
@@ -85,16 +88,27 @@ export function CharacterCard({ character, isActive, onEdit, onDelete }: Charact
         <div className="p-5">
           <div className="flex items-start justify-between gap-2 mb-4">
             <div className="flex items-center gap-3 min-w-0 flex-1">
-              <div className={cn('flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-2xl border', classColor)}>
-                {classIcon}
+              <div className="flex shrink-0 gap-1.5">
+                <div className={cn('flex h-12 w-12 items-center justify-center rounded-xl text-2xl border', classColor)}>
+                  {classIcon}
+                </div>
+                {multi && class2Icon && (
+                  <div className={cn('flex h-12 w-12 items-center justify-center rounded-xl text-2xl border', class2Color)}>
+                    {class2Icon}
+                  </div>
+                )}
               </div>
               <div className="min-w-0">
                 <h3 className="truncate font-fantasy font-semibold text-base leading-tight">{character.name}</h3>
                 <div className="mt-1 flex items-center gap-1.5 flex-wrap">
                   <span className={cn('text-xs font-medium px-2 py-0.5 rounded-full border', classColor)}>
-                    {CLASS_LABELS[character.class] ?? character.class}
+                    {CLASS_LABELS[character.class] ?? character.class} {character.level}
                   </span>
-                  <span className="text-xs text-muted-foreground">Lv. {character.level}</span>
+                  {multi && character.class2 && character.level2 && (
+                    <span className={cn('text-xs font-medium px-2 py-0.5 rounded-full border', class2Color)}>
+                      {CLASS_LABELS[character.class2] ?? character.class2} {character.level2}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>

@@ -37,8 +37,8 @@ export function SpellCard({ spell, isInList, onAdd, onRemove, onViewDetail }: Sp
             {spell.school}
           </span>
           <div className="flex gap-1 shrink-0">
-            {spell.concentration && <span className="text-[10px] font-bold text-amber-700 bg-amber-100 border border-amber-300 dark:text-yellow-400 dark:bg-yellow-400/10 dark:border-yellow-400/20 rounded px-1">C</span>}
-            {spell.ritual && <span className="text-[10px] font-bold text-violet-700 bg-violet-100 border border-violet-300 dark:text-purple-400 dark:bg-purple-400/10 dark:border-purple-400/20 rounded px-1">R</span>}
+            {spell.concentration && <span className="text-[10px] font-bold text-yellow-400 bg-yellow-400/10 border border-yellow-400/20 rounded px-1">C</span>}
+            {spell.ritual && <span className="text-[10px] font-bold text-purple-400 bg-purple-400/10 border border-purple-400/20 rounded px-1">R</span>}
           </div>
         </div>
         <p className="mt-0.5 text-[11px] text-muted-foreground leading-snug">{spell.casting_time}</p>

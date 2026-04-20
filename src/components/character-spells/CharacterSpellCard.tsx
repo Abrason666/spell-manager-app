@@ -68,7 +68,11 @@ export function CharacterSpellCard({ charSpell, characterId, onRemove }: Charact
 
   return (
     <>
-      <div className="relative overflow-hidden rounded-lg select-none">
+      <div className={cn(
+        'relative overflow-hidden rounded-lg select-none',
+        isPrepared && !isCantrip && 'outline outline-2 outline-primary/60',
+        flashClass,
+      )}>
 
         {/* Pannello elimina */}
         <div
@@ -90,8 +94,6 @@ export function CharacterSpellCard({ charSpell, characterId, onRemove }: Charact
           className={cn(
             'relative border border-border/60 bg-card border-l-2 touch-pan-y',
             borderColor,
-            isPrepared && !isCantrip && 'border-primary/60 ring-1 ring-primary/20',
-            flashClass,
           )}
           style={{
             transform: `translateX(${offsetX}px)`,
@@ -118,8 +120,8 @@ export function CharacterSpellCard({ charSpell, characterId, onRemove }: Charact
                   {spell.school}
                 </span>
                 <div className="flex gap-1 shrink-0">
-                  {spell.concentration && <span className="text-[10px] font-bold text-amber-700 bg-amber-100 border border-amber-300 dark:text-yellow-400 dark:bg-yellow-400/10 dark:border-yellow-400/20 rounded px-1">C</span>}
-                  {spell.ritual && <span className="text-[10px] font-bold text-violet-700 bg-violet-100 border border-violet-300 dark:text-purple-400 dark:bg-purple-400/10 dark:border-purple-400/20 rounded px-1">R</span>}
+                  {spell.concentration && <span className="text-[10px] font-bold text-yellow-400 bg-yellow-400/10 border border-yellow-400/20 rounded px-1">C</span>}
+                  {spell.ritual && <span className="text-[10px] font-bold text-purple-400 bg-purple-400/10 border border-purple-400/20 rounded px-1">R</span>}
                 </div>
               </div>
               <p className="mt-0.5 text-[11px] text-muted-foreground leading-snug">{spell.casting_time}</p>
@@ -132,13 +134,13 @@ export function CharacterSpellCard({ charSpell, characterId, onRemove }: Charact
                   className={cn(
                     'flex h-10 w-10 items-center justify-center rounded-lg border transition-all active:scale-95',
                     isPrepared
-                      ? 'border-orange-500/60 bg-orange-100 text-orange-600 dark:bg-orange-400/15 dark:text-orange-400 dark:border-orange-400/50'
-                      : 'border-border/50 text-muted-foreground hover:text-orange-600 hover:border-orange-400/60 hover:bg-orange-50 dark:hover:text-orange-400 dark:hover:bg-orange-400/8',
+                      ? 'border-orange-400/50 bg-orange-400/15 text-orange-400'
+                      : 'border-border/50 text-muted-foreground hover:text-orange-400 hover:border-orange-400/40 hover:bg-orange-400/8',
                   )}
                   onClick={() => togglePrepared.mutate({ id: charSpell.id, isPrepared: !isPrepared })}
                   disabled={togglePrepared.isPending}
                 >
-                  <Flame className={cn('h-4 w-4', isPrepared && 'fill-orange-600 dark:fill-orange-400')} />
+                  <Flame className={cn('h-4 w-4', isPrepared && 'fill-orange-400')} />
                 </button>
               )}
               <button

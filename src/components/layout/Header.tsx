@@ -1,4 +1,4 @@
-import { LogOut, Swords, Sword, Sun, Moon } from 'lucide-react'
+import { LogOut, Swords, Sword } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useCharacters } from '@/hooks/useCharacters'
@@ -13,7 +13,6 @@ export function Header() {
   const { user } = useAuth()
   const { data: characters = [] } = useCharacters(user?.id)
   const { activeCharacterId } = useUIStore()
-  const { theme, toggleTheme } = useThemeStore()
 
   const onSpellbook = location.pathname.startsWith('/spellbook')
   const activeChar = characters.find(c => c.id === activeCharacterId) ?? null
@@ -63,13 +62,6 @@ export function Header() {
 
         {/* Azioni destra */}
         <div className="flex items-center gap-1 shrink-0">
-          <button
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-border/60 text-muted-foreground hover:text-foreground hover:border-border transition-colors"
-            onClick={toggleTheme}
-            title={theme === 'dark' ? 'Passa alla modalità chiara' : 'Passa alla modalità scura'}
-          >
-            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
           {!onSpellbook && (
             <button
               className="flex h-9 items-center gap-1.5 rounded-lg border border-border/60 px-3 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-border transition-colors"

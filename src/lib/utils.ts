@@ -25,25 +25,25 @@ export const CLASS_ICONS: Record<string, string> = {
 }
 
 export const CLASS_COLORS: Record<string, string> = {
-  bard:     'bg-pink-600 text-white border-pink-700 dark:bg-pink-500/15 dark:text-pink-300 dark:border-pink-500/30',
-  cleric:   'bg-amber-500 text-white border-amber-600 dark:bg-yellow-500/15 dark:text-yellow-300 dark:border-yellow-500/30',
-  druid:    'bg-green-600 text-white border-green-700 dark:bg-green-500/15 dark:text-green-300 dark:border-green-500/30',
-  paladin:  'bg-amber-600 text-white border-amber-700 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30',
-  ranger:   'bg-teal-600 text-white border-teal-700 dark:bg-teal-500/15 dark:text-teal-300 dark:border-teal-500/30',
-  sorcerer: 'bg-red-600 text-white border-red-700 dark:bg-red-500/15 dark:text-red-300 dark:border-red-500/30',
-  warlock:  'bg-violet-700 text-white border-violet-800 dark:bg-violet-500/15 dark:text-violet-300 dark:border-violet-500/30',
-  wizard:   'bg-blue-600 text-white border-blue-700 dark:bg-blue-500/15 dark:text-blue-300 dark:border-blue-500/30',
+  bard:     'bg-pink-500/15 text-pink-300 border-pink-500/30',
+  cleric:   'bg-yellow-500/15 text-yellow-300 border-yellow-500/30',
+  druid:    'bg-green-500/15 text-green-300 border-green-500/30',
+  paladin:  'bg-amber-500/15 text-amber-300 border-amber-500/30',
+  ranger:   'bg-teal-500/15 text-teal-300 border-teal-500/30',
+  sorcerer: 'bg-red-500/15 text-red-300 border-red-500/30',
+  warlock:  'bg-violet-500/15 text-violet-300 border-violet-500/30',
+  wizard:   'bg-blue-500/15 text-blue-300 border-blue-500/30',
 }
 
 export const SCHOOL_COLORS: Record<string, string> = {
-  Abjuration:    'bg-blue-600 text-white dark:bg-blue-500/15 dark:text-blue-300 dark:border dark:border-blue-500/25',
-  Conjuration:   'bg-amber-600 text-white dark:bg-amber-500/15 dark:text-amber-300 dark:border dark:border-amber-500/25',
-  Divination:    'bg-cyan-600 text-white dark:bg-cyan-500/15 dark:text-cyan-300 dark:border dark:border-cyan-500/25',
-  Enchantment:   'bg-pink-600 text-white dark:bg-rose-500/15 dark:text-rose-300 dark:border dark:border-rose-500/25',
-  Evocation:     'bg-orange-600 text-white dark:bg-orange-500/15 dark:text-orange-300 dark:border dark:border-orange-500/25',
-  Illusion:      'bg-violet-600 text-white dark:bg-purple-500/15 dark:text-purple-300 dark:border dark:border-purple-500/25',
-  Necromancy:    'bg-emerald-700 text-white dark:bg-emerald-500/15 dark:text-emerald-300 dark:border dark:border-emerald-500/25',
-  Transmutation: 'bg-teal-600 text-white dark:bg-teal-500/15 dark:text-teal-300 dark:border dark:border-teal-500/25',
+  Abjuration:    'bg-blue-500/15 text-blue-300 border border-blue-500/25',
+  Conjuration:   'bg-amber-500/15 text-amber-300 border border-amber-500/25',
+  Divination:    'bg-cyan-500/15 text-cyan-300 border border-cyan-500/25',
+  Enchantment:   'bg-rose-500/15 text-rose-300 border border-rose-500/25',
+  Evocation:     'bg-orange-500/15 text-orange-300 border border-orange-500/25',
+  Illusion:      'bg-purple-500/15 text-purple-300 border border-purple-500/25',
+  Necromancy:    'bg-emerald-500/15 text-emerald-300 border border-emerald-500/25',
+  Transmutation: 'bg-teal-500/15 text-teal-300 border border-teal-500/25',
 }
 
 export const SCHOOL_BORDER: Record<string, string> = {

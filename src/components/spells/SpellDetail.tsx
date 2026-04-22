@@ -69,7 +69,7 @@ export function SpellDetail({ spell }: SpellDetailProps) {
       {spell.description ? (
         <div className="space-y-2">
           <h4 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Descrizione</h4>
-          <div className="text-sm text-foreground/80 leading-relaxed prose-spell">
+          <div className="text-sm text-foreground/80 leading-relaxed prose-spell text-justify">
             <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
               {spell.description}
             </ReactMarkdown>
